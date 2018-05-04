@@ -1,25 +1,18 @@
-from pandas import read_csv
-import re
+import pandas as pd
 import pdb
 
-
+# expected 1-line file w/ comma-separated strings
 def parse_header(filename):
     with open(filename, 'r') as f:
-        headers = []
-        for line in f.readlines():
-            # discard
-            if not line or line[0] == "#":
-                continue
-        pdb.set_trace()
+        line = f.readline().strip('\n')
+        return line.split(',')
 
-def parse_data(filename, headers):
-    pass
-
-
-
-import sys
-if __name__ == "__main__":
-    header_file = sys.argv[1]
-    headers = parse_header(header_file)
-    #parse_data(data_file, headers)
+def parse_data(filename, headers=None):
+    if headers:
+        data = pd.read_csv(filename, names=headers)
+    else:
+        data = pd.read_csv(filename, header=None)
+    restrs = data.values[0]
+    include_cols = [data.columns[c] for c in range(0, len(restrs)) if restrs[c] == 1]
+    return data.filter(items=include_cols).drop([0])
 
