@@ -28,7 +28,7 @@ if __name__ == "__main__":
     parser = ArgumentParser(description="A heirarchical clustering program using the agglomeration method.")
     parser.add_argument("filename", help="Name of input file in csv form. Note that the first line of this file must be a restrictions vector.")
     parser.add_argument("--threshold", help="Specify a threshold value for which to stop agglomeration. By default, will produce the full cluster heirachy")
-    parser.add_argument("--link-method", default="SINGLE", help="Specify link-method for agglomeration. Allowed values: [SINGLE, COMPLETE, AVERAGE, WARD]. By default SINGLE.")
+    parser.add_argument("--link-method", default="SINGLE", help="Specify link-method for agglomeration. Allowed values: SINGLE | COMPLETE | AVERAGE | WARD]. By default SINGLE.")
     parser.add_argument("--headers", help="Name of input file containing header names on a single line in CSV format. Ommitting this will produce plots with unnamed axis")
     args = parser.parse_args()
     headers = None
