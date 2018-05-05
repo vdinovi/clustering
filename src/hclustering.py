@@ -36,8 +36,6 @@ def single_link(c1, c2):
     return min_dist
 
 
-    return min([sum(abs(c1[i] - c2[i])) for i in range(0, len(c1))])
-
 def update_dist(data, clusters, dist_mat, dist_func):
     closest = ((-1, -1), sys.float_info.max)
     for ai in range(0, len(clusters)):
@@ -48,6 +46,7 @@ def update_dist(data, clusters, dist_mat, dist_func):
             if dist_mat[ai][bi] < closest[1]:
                 closest = ((ai, bi), dist_mat[ai][bi])
     return closest[0]
+
 
 def generate(data, dist_func):
     clusters = [(di,) for di in range(0, len(data))]
@@ -63,25 +62,6 @@ def generate(data, dist_func):
     tree[0].node_type = "ROOT"
     return tree[0]
 
-"""
-    return {
-        'type': 'root',
-        'height': 5.0,
-        'nodes': [
-            {
-                'type': 'leaf',
-                'height': 0,
-                'data': 1.0
-            },
-            {
-                'type': 'leaf',
-                'height': 0,
-                'data': 3.0
-            }
-        ]
-    }
-"""
-
 
 if __name__ == "__main__":
     parser = ArgumentParser(description="A heirarchical clustering program using the agglomeration method.")
@@ -95,8 +75,10 @@ if __name__ == "__main__":
         headers = parse_header(args.headers)
     data = parse_data(args.filename, headers)
 
+    # Generate heirarchy tree
     root = generate(data, single_link)
 
+    # Write tree to JSON file
     timestamp = "_" + str(datetime.now().replace(microsecond=0)).replace(' ', '_').replace(':', '-')
     tree_filename = path.basename(args.filename).split('.')[0] + timestamp + ".json"
     with open(tree_filename, 'w') as file:
