@@ -2,10 +2,68 @@ from parser import parse_header, parse_data
 from argparse import ArgumentParser
 from os import path
 from datetime import datetime
+import numpy as np
+import sys
 import json
 import pdb
 
-def generate(data):
+class Node:
+    def __init__(self, node_type, data=None):
+        if node_type not in ['LEAF', 'NODE', 'ROOT']:
+            raise Exception("invalid node type: {}".format(node_type))
+        self.node_type = node_type
+        self.data = data
+
+    def to_dict(self, height):
+        node = {
+            "type": self.node_type,
+            "height": height,
+        }
+        if self.node_type == "LEAF":
+            node["data"] = list(self.data)
+        else:
+            node["nodes"] = [child.to_dict(height + 1) for child in self.data]
+        return node
+
+
+def single_link(c1, c2):
+    min_dist = sys.float_info.max
+    for a in c1:
+        for b in c2:
+            dist = sum(abs(a - b))
+            if dist < min_dist:
+                min_dist = dist
+    return min_dist
+
+
+    return min([sum(abs(c1[i] - c2[i])) for i in range(0, len(c1))])
+
+def update_dist(data, clusters, dist_mat, dist_func):
+    closest = ((-1, -1), sys.float_info.max)
+    for ai in range(0, len(clusters)):
+        for bi in range(ai + 1, len(clusters)):
+            c1 = [data.values[i] for i in clusters[ai]]
+            c2 = [data.values[i] for i in clusters[bi]]
+            dist_mat[ai][bi] = dist_func(c1, c2)
+            if dist_mat[ai][bi] < closest[1]:
+                closest = ((ai, bi), dist_mat[ai][bi])
+    return closest[0]
+
+def generate(data, dist_func):
+    clusters = [(di,) for di in range(0, len(data))]
+    tree = [Node("LEAF", clusters[ci]) for ci in range(0, len(clusters))]
+    dist_mat = np.zeros((len(clusters), len(clusters)), dtype=np.float64)
+    while len(clusters) > 1:
+        closest = update_dist(data, clusters, dist_mat, dist_func)
+        consumer, consumed = (closest[0], closest[1]) if len(clusters[closest[0]]) >= len(clusters[closest[1]]) else (closest[1], closest[0])
+        tree[consumer] = Node("NODE", (tree[consumer], tree[consumed]))
+        tree.remove(tree[consumed])
+        clusters[consumer] = clusters[consumer] + clusters[consumed]
+        clusters.pop(consumed)
+    tree[0].node_type = "ROOT"
+    return tree[0]
+
+"""
     return {
         'type': 'root',
         'height': 5.0,
@@ -22,6 +80,7 @@ def generate(data):
             }
         ]
     }
+"""
 
 
 if __name__ == "__main__":
@@ -36,11 +95,11 @@ if __name__ == "__main__":
         headers = parse_header(args.headers)
     data = parse_data(args.filename, headers)
 
-    root = generate(data)
+    root = generate(data, single_link)
 
     timestamp = "_" + str(datetime.now().replace(microsecond=0)).replace(' ', '_').replace(':', '-')
     tree_filename = path.basename(args.filename).split('.')[0] + timestamp + ".json"
     with open(tree_filename, 'w') as file:
-        file.write(json.dumps(root, sort_keys=True, indent=4, separators=(',', ': ')))
+        file.write(json.dumps(root.to_dict(0), indent=4, separators=(',', ': ')))
 
 
