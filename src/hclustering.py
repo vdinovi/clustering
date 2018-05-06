@@ -36,7 +36,6 @@ def single_link(c1, c2):
                 min_dist = dist
     return min_dist
 
-# untested
 def complete_link(c1, c2):
     max_dist = 0
     for a in c1:
@@ -46,7 +45,6 @@ def complete_link(c1, c2):
                 max_dist = dist
     return max_dist
 
-# untested
 def average_link(c1, c2):
     count = 0
     dists = []
@@ -56,13 +54,17 @@ def average_link(c1, c2):
             count += 1
     return sum(dists) / float(count)
 
-# incomplete 
 def centroid(c1, c2):
-    pass
+    centroid1 = sum(c1) / float(len(c1))
+    centroid2 = sum(c2) / float(len(c2))
+    return sum(abs(centroid2 - centroid1))
 
-# incomplete 
 def wards(c1, c2):
-    pass
+    # |c1| * |c2| / (|c1| + |c2|) * (centroid1 - centroid 2)^2
+    centroid1 = sum(c1) / float(len(c1))
+    centroid2 = sum(c2) / float(len(c2))
+    coef = ((len(c1) * len(c2)) / float(len(c1) + len(c2)))
+    return coef * sum((centroid2 - centroid1)) ** 2
 
 def update_dist(data, clusters, dist_mat, dist_func):
     closest = ((-1, -1), sys.float_info.max)
@@ -112,8 +114,8 @@ def get_clusters(node, threshold, clusters):
 if __name__ == "__main__":
     parser = ArgumentParser(description="A heirarchical clustering program using the agglomeration method. Uses regular manhatten distance for point-distance calucations.")
     parser.add_argument("filename", help="Name of input file in csv form. Note that the first line of this file must be a restrictions vector.")
-    parser.add_argument("--threshold", default=sys.float_info.max, help="Specify a threshold value for which to stop agglomeration. By default, will produce the full cluster heirachy")
-    parser.add_argument("--link-method", default="SINGLE", help="Specify link-method for agglomeration. Allowed values: SINGLE | COMPLETE | AVERAGE | WARD]. By default SINGLE.")
+    parser.add_argument("--threshold", help="Specify a threshold value for which to stop agglomeration. By default, will produce the full cluster heirachy")
+    parser.add_argument("--link-method", default="SINGLE", help="Specify link-method for agglomeration. Allowed values: SINGLE | COMPLETE | AVERAGE | CENTROID | WARD]. By default SINGLE.")
     parser.add_argument("--headers", help="Name of input file containing header names on a single line in CSV format. Ommitting this will produce plots with unnamed axis")
     args = parser.parse_args()
     headers = None
@@ -121,8 +123,16 @@ if __name__ == "__main__":
         headers = parse_header(args.headers)
     data = parse_data(args.filename, headers)
 
+    link_methods = {
+        "SINGLE": single_link,
+        "COMPLETE": complete_link,
+        "AVERAGE": average_link,
+        "CENTROID": centroid,
+        "WARD": wards
+    }
+
     # Generate heirarchy tree
-    root = generate(data, single_link)
+    root = generate(data, link_methods[args.link_method])
 
     # Write tree to JSON file
     timestamp = "_" + str(datetime.now().replace(microsecond=0)).replace(' ', '_').replace(':', '-')
@@ -131,11 +141,12 @@ if __name__ == "__main__":
         print("-> writing dendogram to {}".format(tree_filename))
         file.write(json.dumps(root.to_dict(), indent=4, separators=(',', ': ')))
 
-    clusters = []
-    get_clusters(root, float(args.threshold), clusters)
-    print("{} Clusters".format(len(clusters)))
-    for c in clusters:
-        print("   {}".format(c))
+    if args.threshold:
+        clusters = []
+        get_clusters(root, float(args.threshold), clusters)
+        print("{} Clusters".format(len(clusters)))
+        for c in clusters:
+            print("   {}".format(c))
 
 
 
