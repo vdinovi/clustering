@@ -27,67 +27,63 @@ class Node:
             node["nodes"] = [child.to_dict() for child in self.data]
         return node
 
-def single_link(c1, c2):
-    min_dist = sys.float_info.max
-    for a in c1:
-        for b in c2:
-            dist = sum(abs(a - b))
-            if dist < min_dist:
-                min_dist = dist
-    return min_dist
+def single_link(c1, c2, dist_mat):
+    for row in range(0, len(dist_mat)):
+        dist_mat[row, c1] = min(dist_mat[row, c1], dist_mat[row, c2])
+    dist_mat = np.delete(dist_mat, c2, axis=0)
+    dist_mat = np.delete(dist_mat, c2, axis=1)
+    return dist_mat
 
-def complete_link(c1, c2):
-    max_dist = 0
-    for a in c1:
-        for b in c2:
-            dist = sum(abs(a - b))
-            if dist > max_dist:
-                max_dist = dist
-    return max_dist
+def complete_link(c1, c2, dist_mat):
+    for row in range(0, len(dist_mat)):
+        dist_mat[row, c1] = max(dist_mat[row, c1], dist_mat[row, c2])
+    dist_mat = np.delete(dist_mat, c2, axis=0)
+    dist_mat = np.delete(dist_mat, c2, axis=1)
+    return dist_mat
 
-def average_link(c1, c2):
-    count = 0
-    dists = []
-    for a in c1:
-        for b in c2:
-            dists.append(sum(abs(a - b)))
-            count += 1
-    return sum(dists) / float(count)
+#def average_link(c1, c2, dist_mat):
+#    total = 0.0
+#    count = 0
+#    for a in c1:
+#        total += sum([dist_mat[b] for b in c2])
+#    return total / count
+#def centroid(c1, c2):
+#    centroid1 = sum(c1) / float(len(c1))
+#    centroid2 = sum(c2) / float(len(c2))
+#    return sum(abs(centroid2 - centroid1))
+#def wards(c1, c2):
+#    centroid1 = sum(c1) / float(len(c1))
+#    centroid2 = sum(c2) / float(len(c2))
+#    coef = ((len(c1) * len(c2)) / float(len(c1) + len(c2)))
+#    return coef * sum((centroid2 - centroid1)) ** 2
 
-def centroid(c1, c2):
-    centroid1 = sum(c1) / float(len(c1))
-    centroid2 = sum(c2) / float(len(c2))
-    return sum(abs(centroid2 - centroid1))
-
-def wards(c1, c2):
-    # |c1| * |c2| / (|c1| + |c2|) * (centroid1 - centroid 2)^2
-    centroid1 = sum(c1) / float(len(c1))
-    centroid2 = sum(c2) / float(len(c2))
-    coef = ((len(c1) * len(c2)) / float(len(c1) + len(c2)))
-    return coef * sum((centroid2 - centroid1)) ** 2
-
-def update_dist(data, clusters, dist_mat, dist_func):
-    closest = ((-1, -1), sys.float_info.max)
+def distance_matrix(data):
+    clusters = [(di,) for di in range(0, len(data))]
+    dist_mat = np.zeros((len(clusters), len(clusters)), dtype=np.float64)
     for ai in range(0, len(clusters)):
-        for bi in range(ai + 1, len(clusters)):
-            c1 = [data.values[i] for i in clusters[ai]]
-            c2 = [data.values[i] for i in clusters[bi]]
-            dist_mat[ai][bi] = dist_func(c1, c2)
-            if dist_mat[ai][bi] < closest[1]:
-                closest = ((ai, bi), dist_mat[ai][bi])
-    return closest
+        for bi in range(ai, len(clusters)):
+            dist_mat[ai, bi] = sum(abs((data.values[ai] - data.values[bi])))
+    return dist_mat, clusters
+
+def find_closest(dist_mat):
+    x, y, dist = 0, 0, sys.float_info.max
+    for ai in range(0, len(dist_mat)):
+        for bi in range(ai, len(dist_mat)):
+            if ai != bi and dist_mat[ai, bi] <= dist:
+                dist = dist_mat[ai, bi]
+                x, y = ai, bi
+    return x, y, dist
 
 def generate(data, dist_func):
-    clusters = [(di,) for di in range(0, len(data))]
+    dist_mat, clusters = distance_matrix(data)
     tree = [Node("LEAF", 0, clusters[ci][0]) for ci in range(0, len(clusters))]
-    dist_mat = np.zeros((len(clusters), len(clusters)), dtype=np.float64)
     while len(clusters) > 1:
-        closest, dist = update_dist(data, clusters, dist_mat, dist_func)
-        consumer, consumed = (closest[0], closest[1]) if len(clusters[closest[0]]) >= len(clusters[closest[1]]) else (closest[1], closest[0])
-        tree[consumer] = Node("NODE", dist, (tree[consumer], tree[consumed]))
-        tree.remove(tree[consumed])
-        clusters[consumer] = clusters[consumer] + clusters[consumed]
-        clusters.pop(consumed)
+        c1, c2, dist = find_closest(dist_mat)
+        tree[c1] = Node("NODE", dist, (tree[c1], tree[c2]))
+        tree.remove(tree[c2])
+        clusters[c1] += clusters[c2]
+        clusters.pop(c2)
+        dist_mat = dist_func(c1, c2, dist_mat)
     tree[0].node_type = "ROOT"
     return tree[0]
 
@@ -125,10 +121,10 @@ if __name__ == "__main__":
 
     link_methods = {
         "SINGLE": single_link,
-        "COMPLETE": complete_link,
-        "AVERAGE": average_link,
-        "CENTROID": centroid,
-        "WARD": wards
+        "COMPLETE": complete_link
+        #"AVERAGE": average_link
+        #"CENTROID": centroid,
+        #"WARD": wards
     }
 
     # Generate heirarchy tree
