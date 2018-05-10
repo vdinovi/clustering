@@ -158,11 +158,12 @@ if __name__ == "__main__":
         print("-> writing dendrogram to {}".format(tree_filename))
         file.write(json.dumps(root.to_dict(), indent=4, separators=(',', ': ')))
 
-    # Print info
+    # Apply threshold to get resulting clusters
     if args.threshold:
         np.set_printoptions(precision=4)
         clusters = []
         get_clusters(root, float(args.threshold), clusters)
+        # Print cluster stats
         stats = cluster_stats(clusters, data)
         for name, stat in stats.items():
             print(name)
