@@ -1,4 +1,6 @@
 from parser import parse_header, parse_data
+from stats import cluster_stats
+
 from argparse import ArgumentParser
 from os import path
 from datetime import datetime
@@ -156,14 +158,16 @@ if __name__ == "__main__":
         print("-> writing dendogram to {}".format(tree_filename))
         file.write(json.dumps(root.to_dict(), indent=4, separators=(',', ': ')))
 
+    # Print info
     if args.threshold:
+        np.set_printoptions(precision=4)
         clusters = []
         get_clusters(root, float(args.threshold), clusters)
-        print("{} Clusters".format(len(clusters)))
-        for c in clusters:
-            print("   {}".format(c))
-
-
-
+        stats = cluster_stats(clusters, data)
+        for name, stat in stats.items():
+            print(name)
+            for k, v in stat.items():
+                print("  {}: {}".format(k, v))
+            print()
 
 
