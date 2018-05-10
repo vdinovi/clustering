@@ -155,7 +155,7 @@ if __name__ == "__main__":
     timestamp = "_" + str(datetime.now().replace(microsecond=0)).replace(' ', '_').replace(':', '-')
     tree_filename = path.basename(args.filename).split('.')[0] + timestamp + ".json"
     with open(tree_filename, 'w') as file:
-        print("-> writing dendogram to {}".format(tree_filename))
+        print("-> writing dendrogram to {}".format(tree_filename))
         file.write(json.dumps(root.to_dict(), indent=4, separators=(',', ': ')))
 
     # Print info
