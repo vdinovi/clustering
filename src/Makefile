@@ -5,4 +5,11 @@ clean:
 	rm *.json
 
 hcl:
-	python3 hclustering.py --headers ../dataset/header_AccidentsSet01.txt ../dataset/AccidentsSet01.csv
+	python3 hclustering.py ../dataset/AccidentsSet01.csv
+
+hcl8:
+	python3 hclustering.py ../dataset/AccidentsSet01.csv --threshold 8
+
+avg8:
+	python3 hclustering.py --link-method AVERAGE ../dataset/AccidentsSet01.csv --threshold 8
+
