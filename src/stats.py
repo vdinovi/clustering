@@ -1,11 +1,12 @@
 import pdb
+import numpy as np
 import random
 
 def centroid(cluster, data):
     return sum([data.values[p] for p in cluster]) / float(len(cluster))
 
 def sample(cluster, data, limit):
-    return random.sample([data.values[p] for p in cluster], limit)
+    return random.sample([data.values[p] for p in cluster], min(len(cluster), limit))
 
 def max_dist(cluster, data, center):
     return max([sum(abs(data.values[p] - center)) for p in cluster])
@@ -16,6 +17,9 @@ def min_dist(cluster, data, center):
 def avg_dist(cluster, data, center):
     return sum([sum(abs(data.values[p] - center)) for p in cluster]) / float(len(cluster))
 
+def dist_variance(cluster, data, center):
+    return np.var([sum(abs(data.values[p] - center)) for p in cluster])
+
 def cluster_stats(clusters, data):
     stats = {}
     for index, cluster in enumerate(clusters):
@@ -25,6 +29,7 @@ def cluster_stats(clusters, data):
             "Max Dist": round(max_dist(cluster, data, center), 4),
             "Min Dist": round(min_dist(cluster, data, center), 4),
             "Avg Dist": round(avg_dist(cluster, data, center), 4),
+            "Dist-Variance": round(dist_variance(cluster, data, center), 4),
             "Size": len(cluster),
             "Sample": [tuple(s) for s in sample(cluster, data, 5)]
         }
