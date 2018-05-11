@@ -3,6 +3,8 @@ import pandas as pd
 from parser import *
 from random import randint
 from math import sqrt
+from stats import cluster_stats
+from argparse import ArgumentParser
 import pdb
 
 def getTestData():
@@ -49,16 +51,16 @@ def centroidDifference(newCentroids,oldCentroids,distanceType):
       totalDistance += distance(centroidA,centroidB,distanceType)
    return totalDistance
 
-def updateCentroids(data,clusterValues):
+def updateCentroids(data,clusterValues,k):
    # should return a new set of centroids based on cluster values
-   d = {key:[] for key in set(clusterValues)}
+   d = {key:[] for key in range(k)}
    for i in range(len(data.values)):
       d[clusterValues[i]].append(data.values[i])
    averaged = {key:np.average(d[key],axis=(0)) for key in d.keys()}
    newCentroids = [averaged[key] for key in averaged.keys()]
    return pd.DataFrame(newCentroids)
 
-def kmeans(data,k,distanceType,threshold):
+def kmeansHelper(data,k,distanceType,threshold):
    stopCondition = False
    # 1. get Initial centroids
    centroids = getInitialCentroids(data,k)
@@ -67,7 +69,7 @@ def kmeans(data,k,distanceType,threshold):
       # 2. Assign clusters
       clusterValues = classify(data,centroids,"manhattan")
       # 3. Update centroids
-      newCentroids = updateCentroids(data,clusterValues)
+      newCentroids = updateCentroids(data,clusterValues,k)
       # Evaluate if we should stop
       #print(lastCentroids)
       if(centroidDifference(newCentroids,centroids,distanceType) < threshold):
@@ -76,4 +78,24 @@ def kmeans(data,k,distanceType,threshold):
          stopCondition = True
       lastCentroids = centroids
       centroids = newCentroids
-   return centroids
+   return centroids,clusterValues
+
+def kmeans(data,k,distanceType,threshold):
+   centroids, c = kmeansHelper(data,k,distanceType,threshold);
+   arr = [[i for i in range(len(c)) if c[i] == j] for j in set(c)]
+   return arr
+
+if __name__ == "__main__":
+  parser = ArgumentParser(description="kmeans clustering.")
+  parser.add_argument("filename", help="Name of the input file in csv form. Note that the first line of this file must be a restrictions vector.")
+  parser.add_argument("--threshold",type=float, help="threshold for difference between clusters to end computation.")
+  parser.add_argument("--k",type=int, help="number of clusters to find.")
+  args = parser.parse_args()
+  data = parse_data(args.filename)
+  clusters = kmeans(data,args.k,"manhattan",args.threshold)
+  stats = cluster_stats(clusters,data)
+  for name, stat in stats.items():
+     print(name)
+     for k,v in stat.items():
+        print("  {}: {}".format(k, v))
+     print()

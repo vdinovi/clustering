@@ -34,4 +34,3 @@ def cluster_stats(clusters, data):
             "Sample": [tuple(s) for s in sample(cluster, data, 5)]
         }
     return stats
-
