@@ -132,6 +132,38 @@ def get_clusters(node, threshold, clusters):
         for child in node.data:
             get_clusters(child, threshold, clusters)
 
+def plot(filename, root, data, data_name):
+    import matplotlib.pyplot as plt
+    thresholds = []
+    variances = []
+    sizes = []
+
+    thresh = 0
+    dt = 0.1
+    while thresh <= root.height * 1.25:
+        clusters = []
+        get_clusters(root, thresh, clusters)
+        stats = cluster_stats(clusters, data)
+        avg_var = sum([cluster["Dist-Variance"] for _, cluster in stats.items()]) / len(stats)
+        num_clusters = len(stats)
+        thresholds.append(thresh)
+        variances.append(avg_var)
+        sizes.append(num_clusters)
+        thresh += dt
+    plt.clf()
+    fig, (ax1, ax2) = plt.subplots(2, sharex=True)
+    fig.suptitle('Heirarchical Clustering on {}'.format(data_name))
+    # Variance
+    ax1.plot(thresholds, variances)
+    ax1.set(ylabel="Variance in dist to center")
+    # Size
+    ax2.plot(thresholds, sizes)
+    ax2.set(ylabel="Number of clusters")
+    print("-> writing plot to {}".format(filename))
+    plt.savefig(filename)
+
+
+
 
 if __name__ == "__main__":
     parser = ArgumentParser(description="A heirarchical clustering program using the agglomeration method. Uses regular manhatten distance for point-distance calucations.")
@@ -139,6 +171,7 @@ if __name__ == "__main__":
     parser.add_argument("--threshold", help="Specify a threshold value for which to stop agglomeration. By default, will produce the full cluster heirachy")
     parser.add_argument("--link-method", default="SINGLE", help="Specify link-method for agglomeration. Allowed values: SINGLE | COMPLETE | AVERAGE | CENTROID | WARDS]. By default SINGLE.")
     parser.add_argument("--headers", help="Name of input file containing header names on a single line in CSV format. Ommitting this will produce plots with unnamed axis")
+    parser.add_argument("--plot-stats", action="store_true", help="Plot various statistics against varying threshold values")
     args = parser.parse_args()
     headers = None
     if args.headers:
@@ -175,5 +208,13 @@ if __name__ == "__main__":
             for k, v in stat.items():
                 print("  {}: {}".format(k, v))
             print()
+
+    # Plot stats against thresholds
+    if args.plot_stats:
+        plot_filename = path.basename(args.filename).split('.')[0] + timestamp + ".png"
+        plot(plot_filename, root, data, args.filename)
+
+
+
 
 

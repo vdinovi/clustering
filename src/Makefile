@@ -2,7 +2,7 @@ all:
 	$(NOOP)
 
 clean:
-	rm *.json
+	rm *.json *.png
 
 hcl:
 	python3 hclustering.py ../dataset/AccidentsSet01.csv
