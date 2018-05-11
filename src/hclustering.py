@@ -158,7 +158,7 @@ def plot(filename, root, data, data_name):
     ax1.set(ylabel="Variance in dist to center")
     # Size
     ax2.plot(thresholds, sizes)
-    ax2.set(ylabel="Number of clusters")
+    ax2.set(ylabel="Number of clusters", xlabel="threshold")
     print("-> writing plot to {}".format(filename))
     plt.savefig(filename)
 
