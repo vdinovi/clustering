@@ -34,6 +34,7 @@ def single_link(c1, c2, dist_mat, clusters, data):
     # clusters, data unused -- passed for consistency with other methods
     for row in range(0, len(dist_mat)):
         dist_mat[row, c1] = min(dist_mat[row, c1], dist_mat[row, c2])
+        dist_mat[c1, row] = dist_mat[row, c1]
     dist_mat = np.delete(dist_mat, c2, axis=0)
     dist_mat = np.delete(dist_mat, c2, axis=1)
     return dist_mat
@@ -42,6 +43,7 @@ def complete_link(c1, c2, dist_mat, clusters, data):
     # clusters, data unused -- passed for consistency with other methods
     for row in range(0, len(dist_mat)):
         dist_mat[row, c1] = max(dist_mat[row, c1], dist_mat[row, c2])
+        dist_mat[c1, row] = dist_mat[row, c1]
     dist_mat = np.delete(dist_mat, c2, axis=0)
     dist_mat = np.delete(dist_mat, c2, axis=1)
     return dist_mat
@@ -51,6 +53,7 @@ def average_link(c1, c2, dist_mat, clusters, data):
     # clusters, data unused -- passed for consistency with other methods
     for row in range(0, len(dist_mat)):
         dist_mat[row, c1] = (dist_mat[row, c1] + dist_mat[row, c2]) / 2
+        dist_mat[c1, row] = dist_mat[row, c1]
     dist_mat = np.delete(dist_mat, c2, axis=0)
     dist_mat = np.delete(dist_mat, c2, axis=1)
     return dist_mat
@@ -62,6 +65,7 @@ def centroid(c1, c2, dist_mat, clusters, data):
     for row in range(0, len(dist_mat)):
         orig = sum([data.values[p] for p in clusters[row]]) / len(clusters[row])
         dist_mat[row, c1] = sum(abs(orig - centroid))
+        dist_mat[c1, row] = dist_mat[row, c1]
     dist_mat = np.delete(dist_mat, c2, axis=0)
     dist_mat = np.delete(dist_mat, c2, axis=1)
     return dist_mat
@@ -74,6 +78,7 @@ def wards(c1, c2, dist_mat, clusters, data):
         orig = sum([data.values[p] for p in clusters[row]]) / len(clusters[row])
         coef = len(clusters[row]) * len(cluster) / float(len(clusters[row]) + len(cluster))
         dist_mat[row, c1] = coef * math.sqrt(sum(orig - centroid) ** 2)
+        dist_mat[c1, row] = dist_mat[row, c1]
     dist_mat = np.delete(dist_mat, c2, axis=0)
     dist_mat = np.delete(dist_mat, c2, axis=1)
     return dist_mat
@@ -82,7 +87,7 @@ def distance_matrix(data):
     clusters = [(di,) for di in range(0, len(data))]
     dist_mat = np.zeros((len(clusters), len(clusters)), dtype=np.float64)
     for ai in range(0, len(clusters)):
-        for bi in range(ai, len(clusters)):
+        for bi in range(0, len(clusters)):
             dist_mat[ai, bi] = sum(abs((data.values[ai] - data.values[bi])))
     return dist_mat, clusters
 
