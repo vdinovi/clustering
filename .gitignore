@@ -3,5 +3,5 @@ dataset/**
 *.json
 __pycache__
 *.pyc
-*.png
+src/**/*.png
 .DS_Store
