@@ -132,7 +132,7 @@ def get_clusters(node, threshold, clusters):
         for child in node.data:
             get_clusters(child, threshold, clusters)
 
-def plot_stats(filename, root, data, data_name):
+def plot_stats(filename, root, data, data_name, link_method):
     import matplotlib.pyplot as plt
     thresholds = []
     variances = []
@@ -154,6 +154,7 @@ def plot_stats(filename, root, data, data_name):
     plt.clf()
     fig, (ax1, ax2) = plt.subplots(2, sharex=True)
     fig.suptitle('Heirarchical Clustering on {}'.format(data_name))
+    fig.text(0.9, 0.9, "link method: " + link_method, fontsize=12)
     # Variance
     ax1.plot(thresholds, variances)
     ax1.set(ylabel="Avg. variance dist-to-center")
@@ -234,7 +235,7 @@ if __name__ == "__main__":
     # Plot stats against thresholds
     if args.plot_stats:
         plot_filename = path.basename(args.filename).split('.')[0] + "_stats" + timestamp + ".png"
-        plot_stats(plot_filename, root, data, args.filename)
+        plot_stats(plot_filename, root, data, args.filename, args.link_method)
 
 
 

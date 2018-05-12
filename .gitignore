@@ -3,3 +3,4 @@ dataset/**
 *.json
 __pycache__
 *.pyc
+*.png
