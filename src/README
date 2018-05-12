@@ -9,8 +9,9 @@ Billy Gottenstrater - wgottens@calpoly.edu
     [-h] for help
     [--threshold THRESHOLD] threshold value to stop agglomeration
     [--link-method LINK_METHOD] distance function (SINGLE | COMPLETE | AVERAGE | CENTROID | WARDS)
-    [--headers HEADER_FILENAME] header filename (not always used)
-
+    [--plot-clusters] Plot the generated clusters (requires threshold provided and only applicable to 2d points)
+    [--plot-stats] Plot statistics for generated clusters (requires threshold provided)
+ 
 3. DBSCAN: python3 dbscan.py <csv_filename> <epsilon> <num_points>
     [-h] for help
 
