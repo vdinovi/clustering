@@ -42,9 +42,10 @@ def addLabel(i,labels,cluster):
 def densityConnected(data,i,e,distanceType,cluster,core,labels):
    nb = nearbyPoints(data,i,e,distanceType)
    for i in range(len(nb)):
-      addLabel(i,labels,cluster)
-      if i in core and not labels[i]:
-         densityConnected(data,i,e,distanceType,cluster,core,labels)
+      
+      addLabel(nb[i],labels,cluster)
+      if nb[i] in core and not labels[nb[i]]:
+         densityConnected(data,nb[i],e,distanceType,cluster,core,labels)
 
 def dbscanHelper(data,numPoints,e,distanceType):
    # Return clusters as an array of arrays, with each array containing a cluster
@@ -62,6 +63,7 @@ def dbscanHelper(data,numPoints,e,distanceType):
    
 def dbscan(data,numPoints,e,distanceType):
     noise, border, core, clusters = dbscanHelper(data,numPoints,e,distanceType)
+    print(core)
     return clusters
 
 
