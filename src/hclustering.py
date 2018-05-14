@@ -165,13 +165,25 @@ def plot_stats(filename, root, data, data_name, link_method):
     plt.savefig(filename)
 
 
-def plot_clusters(filename, clusters, data, data_name):
+def plot_clusters_2d(filename, clusters, data, data_name):
     import matplotlib.pyplot as plt
     x, y, c = zip(*([(data.values[p][0], data.values[p][1], label) for label, cl in enumerate(clusters) for p in cl]))
     plt.style.use('ggplot')
     plt.clf()
     plt.title('Heirarchical Clustering on {}'.format(data_name))
     plt.scatter(x, y, c=c)
+    print("-> writing cluster plot to {}".format(filename))
+    plt.savefig(filename)
+
+def plot_clusters_3d(filename, clusters, data, data_name):
+    import matplotlib.pyplot as plt
+    from mpl_toolkits.mplot3d import Axes3D
+    x, y, z, c = zip(*([(data.values[p][0], data.values[p][1], data.values[p][2], label) for label, cl in enumerate(clusters) for p in cl]))
+    plt.style.use('ggplot')
+    plt.clf()
+    plt.title('Heirarchical Clustering on {}'.format(data_name))
+    ax = Axes3D(plt.figure())
+    ax.scatter(x, y, z, c=c)
     print("-> writing cluster plot to {}".format(filename))
     plt.savefig(filename)
 
@@ -225,10 +237,13 @@ if __name__ == "__main__":
             print()
         # print points
         if args.plot_clusters:
-            if len(data.columns) != 2:
-                raise Exception("Cannot plot data with dimensions {}, must be 2".format(len(data.columns)))
             plot_filename = path.basename(args.filename).split('.')[0] + "_clusters" + timestamp + ".png"
-            plot_clusters(plot_filename, clusters, data, args.filename)
+            if len(data.columns) == 2:
+                plot_clusters_2d(plot_filename, clusters, data, args.filename)
+            elif len(data.columns) == 3:
+                plot_clusters_3d(plot_filename, clusters, data, args.filename)
+            else:
+                raise Exception("Cannot plot data with {} dimensions, must be 2 or 3 dimensions".format(len(data.columns)))
 
 
 
