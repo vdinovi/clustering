@@ -146,6 +146,10 @@ if __name__ == "__main__":
    parser.add_argument("--plot-stats", action="store_true", help="Plot various statistics against varying threshold values")
    parser.add_argument("--plot-clusters", action="store_true", help="Plot clusters generated on 2-d data (note that this works only on 2-d data)")
    args = parser.parse_args()
+   if not args.e:
+      raise Exception("Must provide an float value for epsilon")
+   if not args.numpoints:
+      raise Exception("Must provide an integer value for numpoints")
    headers = None
    if args.headers:
       headers = parse_header(args.headers)
