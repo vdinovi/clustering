@@ -71,8 +71,15 @@ if __name__ == "__main__":
   parser.add_argument("--numpoints",type=int, help="The number of points to constitute suitable density for a cluster.")
   args = parser.parse_args()
   data = parse_data(args.filename)
+  if not args.e:
+      raise Exception("Must provide an float value for epsilon")
+  if not args.numpoints:
+      raise Exception("Must provide an integer value for numpoints")
+
+
   clusters = dbscan(data,args.numpoints,args.e,"manhattan")
   stats = cluster_stats(clusters,data)
+
   for name, stat in stats.items():
      print(name)
      for k,v in stat.items():
