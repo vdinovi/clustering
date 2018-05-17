@@ -60,7 +60,6 @@ def dbscanHelper(data,numPoints,e,distanceType):
    border = [i for i in range(len(labels)) if (i not in noise) and (i not in core)]
    clusters = [[i for i in range(len(labels)) if labels[i] == j] for j in set(labels)]
    clusters = [c for c in clusters if c]
-   pdb.set_trace()
    return noise, border, core, clusters
    
 def dbscan(data,numPoints,e,distanceType):
