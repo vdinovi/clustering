@@ -36,10 +36,10 @@ def getCorePoints(data,numPoints,e,distanceType):
    return corePoints
 
 def addLabel(i,labels,cluster):
-   if not labels[i]:
+    if not labels[i] or np.isnan(labels[i]):
       labels[i] = cluster
       return True
-   return False
+    return False
 
 def densityConnected(data,i,e,distanceType,cluster,core,labels):
    nb = nearbyPoints(data,i,e,distanceType)
@@ -51,7 +51,7 @@ def dbscanHelper(data,numPoints,e,distanceType):
    # Return clusters as an array of arrays, with each array containing a cluster
    core = getCorePoints(data,numPoints,e,distanceType)
    cluster = 1
-   labels = np.full(len(data),None)
+   labels = np.full(len(data), None)
    for i in range(len(core)):
       if(addLabel(core[i],labels,cluster)):
          densityConnected(data,core[i],e,distanceType,cluster,core,labels)
@@ -59,6 +59,8 @@ def dbscanHelper(data,numPoints,e,distanceType):
    noise = [i for i in range(len(labels)) if not labels[i]]
    border = [i for i in range(len(labels)) if (i not in noise) and (i not in core)]
    clusters = [[i for i in range(len(labels)) if labels[i] == j] for j in set(labels)]
+   clusters = [c for c in clusters if c]
+   pdb.set_trace()
    return noise, border, core, clusters
    
 def dbscan(data,numPoints,e,distanceType):
@@ -104,7 +106,7 @@ def plot_stats(filename, data, data_name):
          clusters = dbscan(data,numPoints,e,"manhattan")
          stats = cluster_stats(clusters,data)
          num_clusters = len(stats)
-         avg_var = sum([cluster["Dist-Variance"] for _, cluster in stats.items()])/num_clusters
+         avg_var = sum([cluster["Dist-Variance"] for _, cluster in stats.items()]) / float(num_clusters)
          
          if(avg_var < min_var):
             min_var = avg_var
@@ -173,3 +175,4 @@ if __name__ == "__main__":
          plot_clusters_3d(plot_filename,clusters,data,args.filename)
       else:
          raise Exception("Cannot plot data with {} dimensions,must be 2".format(len(data.columns)))
+
