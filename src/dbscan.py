@@ -122,7 +122,7 @@ def plot_stats(filename, data, data_name):
    ax.set(xlabel="epsilon",ylabel="numPoints",zlabel="variance")
    ax.scatter(es,numpoints,variances)
    print("-> writing stats plot to  {}".format(filename))
-   print("Best Variance = {}, achived with e={}, numPoints={}".format(min_var,best_combo[0],best_combo[1]))
+   print("Best Variance = {}, achieved with e={}, numPoints={}".format(min_var,best_combo[0],best_combo[1]))
    plt.savefig(filename)
    '''fig, (ax1, ax2) = plt.subplots(2, sharex=True)
    fig.suptitle('Heirarchical Clustering on {}'.format(data_name))

@@ -3,8 +3,28 @@ Vittorio Dinovi - vdinovi@calpoly.edu
 Billy Gottenstrater - wgottens@calpoly.edu
 
 3 Executables:
-1. Kmeans: python3 kmeans.py <todo: add usage info here>
+1. Kmeans: python3 kmeans.py [-h] [--threshold THRESHOLD] [--k K] [--headers HEADERS]
+                 [--plot-stats] [--plot-clusters]
+                 filename
 
+   positional arguments:
+     filename              Name of the input file in csv form. Note that the
+                           first line of this file must be a restrictions vector.
+   
+   optional arguments:
+     -h, --help            show this help message and exit
+     --threshold THRESHOLD
+                           threshold for difference between clusters to end
+                           computation.
+     --k K                 number of clusters to find.
+     --headers HEADERS     Name of input file containing header names on a single
+                           line in CSV format. Ommitting this will produce plots
+                           with unnamed axis
+     --plot-stats          Plot various statistics against varying threshold
+                           values
+     --plot-clusters       Plot clusters generated on 2 or 3-d data (note that this
+                           works only on 2 or 3-d data)
+   
 2. Heirarchical: python3 hclusering.py <csv_filename> [--threshold THRESHOLD]
     [-h] for help
     [--threshold THRESHOLD] threshold value to stop agglomeration
@@ -12,6 +32,26 @@ Billy Gottenstrater - wgottens@calpoly.edu
     [--plot-clusters] Plot the generated clusters (requires threshold provided and only applicable to 2d points)
     [--plot-stats] Plot statistics for generated clusters (requires threshold provided)
  
-3. DBSCAN: python3 dbscan.py <csv_filename> <epsilon> <num_points>
-    [-h] for help
+3. DBSCAN: python3 dbscan.py [-h] [--e E] [--numpoints NUMPOINTS] [--headers HEADERS]
+                 [--plot-stats] [--plot-clusters]
+                 filename
 
+   positional arguments:
+     filename              Name of the input file in csv form. Note that the
+                           first line of this file must be a restrictions vector.
+   
+   optional arguments:
+     -h, --help            show this help message and exit
+     --e E                 epsilon value for size of the sphere used when
+                           computing clusters.
+     --numpoints NUMPOINTS
+                           The number of points to constitute suitable density
+                           for a cluster.
+     --headers HEADERS     Name of input file containing header names on a single
+                           line in CSV format. Ommitting this will produce plots
+                           with unnamed axis
+     --plot-stats          Plot various statistics against varying threshold
+                           values
+     --plot-clusters       Plot clusters generated on 2 or 3-d data (note that this
+                           works only on 2 or 3-d data)
+   
