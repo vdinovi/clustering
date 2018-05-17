@@ -98,7 +98,7 @@ def plot_stats(filename, data, data_name):
    e_step = .5
    min_var = float('inf')
    best_combo = (None,None)
-   for numPoints in range(1,11): #numpoints
+   for numPoints in range(2,11): #numpoints
       e = 1
       while(e <= 10):
          clusters = dbscan(data,numPoints,e,"manhattan")
@@ -162,6 +162,9 @@ if __name__ == "__main__":
          print("  {}: {}".format(k, v))
       print()
    timestamp = "_" + str(datetime.now().replace(microsecond=0)).replace(' ', '_').replace(':', '-')
+   if args.plot_stats:
+      plot_filename = path.basename(args.filename).split('.')[0] + "_stats" + timestamp + ".png"
+      plot_stats(plot_filename, data, args.filename)
    if args.plot_clusters:
       plot_filename = path.basename(args.filename).split(".")[0] + "_clusters"+timestamp+".png"
       if len(data.columns) == 2:
@@ -170,6 +173,3 @@ if __name__ == "__main__":
          plot_clusters_3d(plot_filename,clusters,data,args.filename)
       else:
          raise Exception("Cannot plot data with {} dimensions,must be 2".format(len(data.columns)))
-   if args.plot_stats:
-      plot_filename = path.basename(args.filename).split('.')[0] + "_stats" + timestamp + ".png"
-      plot_stats(plot_filename, data, args.filename)

@@ -130,7 +130,7 @@ def plot_stats(filename, data, data_name):
       variances.append(avg_var)
    plt.style.use('ggplot')
    plt.clf()
-   plt.title("DBSCAN on {}".format(data_name))
+   plt.title("Kmeans on {}".format(data_name))
    plt.plot(ks,variances)
    plt.xlabel("k")
    plt.ylabel("variance")
@@ -161,6 +161,9 @@ if __name__ == "__main__":
       for k,v in stat.items():
          print("  {}: {}".format(k, v))
       print()
+   if args.plot_stats:
+      plot_filename = path.basename(args.filename).split('.')[0] + "_stats" + timestamp + ".png"
+      plot_stats(plot_filename, data, args.filename)
    if args.plot_clusters:
       plot_filename = path.basename(args.filename).split(".")[0] + "_clusters"+timestamp+".png"
       if len(data.columns) == 3:
@@ -169,6 +172,3 @@ if __name__ == "__main__":
          plot_clusters(plot_filename,clusters,data,args.filename,args.k)
       else:
          raise Exception("Cannot plot data with {} dimension, must be 2".format(len(data.columns)))
-   if args.plot_stats:
-      plot_filename = path.basename(args.filename).split('.')[0] + "_stats" + timestamp + ".png"
-      plot_stats(plot_filename, data, args.filename)
