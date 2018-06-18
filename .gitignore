@@ -5,3 +5,4 @@ __pycache__
 *.pyc
 src/**/*.png
 .DS_Store
+lab03.tar.gz
